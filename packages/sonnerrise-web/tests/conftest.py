@@ -34,12 +34,12 @@ def session(engine) -> Generator[Session, None, None]:
 @pytest.fixture
 def app(engine, session) -> Flask:
     """Create Flask test application."""
-    from sonnerrise_core import SonnerriseConfig
+    from sonnerrise_core import DatabaseConfig, SonnerriseConfig
     from sonnerrise_web.app import create_app
 
     # Create a mock config
     config = SonnerriseConfig(
-        database={"type": "sqlite", "path": ":memory:"}
+        database=DatabaseConfig(plugin="sqlite", database=":memory:")
     )
 
     app = create_app(config)
