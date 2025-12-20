@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime as dt
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -48,7 +48,7 @@ class EventBase(BaseModel):
     """Base schema for track events."""
 
     datetime: Annotated[
-        datetime,
+        dt,
         Field(description="Event date and time"),
     ]
     description: Annotated[
@@ -79,7 +79,7 @@ class EventCreate(EventBase):
 class EventUpdate(BaseModel):
     """Schema for updating an event."""
 
-    datetime: datetime | None = None
+    datetime: dt | None = None
     description: Annotated[
         str | None,
         Field(max_length=200, description="Event description"),
@@ -108,12 +108,12 @@ class EventRead(EventBase):
     @property
     def is_past(self) -> bool:
         """Check if the event is in the past."""
-        return self.datetime < datetime.now()
+        return self.datetime < dt.now()
 
     @property
     def is_upcoming(self) -> bool:
         """Check if the event is in the future and enabled."""
-        return self.enabled and self.datetime >= datetime.now()
+        return self.enabled and self.datetime >= dt.now()
 
 
 class TrackBase(BaseModel):
@@ -227,8 +227,8 @@ class TrackRead(BaseModel):
     comments: str | None
     links: list[LinkRead]
     events: list[EventRead]
-    created_at: datetime
-    updated_at: datetime
+    created_at: dt
+    updated_at: dt
 
 
 class TrackListItem(BaseModel):
@@ -294,14 +294,14 @@ class UpcomingEvent(BaseModel):
     event_id: int
     track_id: int
     track_title: str
-    datetime: datetime
+    datetime: dt
     description: str
     days_until: int
 
     @classmethod
     def from_event(cls, event, track) -> "UpcomingEvent":
         """Create from event and track model instances."""
-        now = datetime.now()
+        now = dt.now()
         delta = event.datetime - now
         days_until = max(0, delta.days)
 
