@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ title }}</h2>
+    {% if promo %}
+    <p class="subtitle">Promotion for: <a href="{{ url_for('tracks.edit', id=promo.track.id) }}">{{ promo.track.title }}</a></p>
+    {% endif %}
+</div>
+
+<div class="two-column">
+    <div>
+        <div class="card">
+            <div class="card-header">Promotion Details</div>
+            <div class="card-body">
+                <form method="post" id="promo-form">
+                    {{ form.hidden_tag() }}
+
+                    {% if not promo %}
+                    <div class="form-group">
+                        {{ form.track_id.label }}
+                        {{ form.track_id(class="form-control") }}
+                        {% if form.track_id.errors %}
+                            {% for error in form.track_id.errors %}
+                                <div class="form-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="track_id" value="{{ promo.track_id }}">
+                    {% endif %}
+
+                    <div class="form-group">
+                        {{ form.track_art_definition.label }}
+                        {{ form.track_art_definition(class="form-control") }}
+                        <div class="form-hint">AI art generation prompt for still images</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.canvas_definition.label }}
+                        {{ form.canvas_definition(class="form-control") }}
+                        <div class="form-hint">AI generation prompt for short videos (canvas)</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.pitch.label }}
+                        {{ form.pitch(class="form-control") }}
+                        <div class="form-hint">Pitch/blurb/promo text snippets</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.summary.label }}
+                        {{ form.summary(class="form-control") }}
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="{{ url_for('promo.list') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        {% if promo %}
+        <div class="card">
+            <div class="card-header">Promotion/Media Links</div>
+            <div class="card-body">
+                {% if links %}
+                <ul class="links-list">
+                    {% for link in links %}
+                    <li>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <a href="{{ link.url }}" target="_blank">{{ link.title or link.url }}</a>
+                            </div>
+                            <form method="post" action="{{ url_for('promo.delete_link', id=promo.id, link_id=link.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="color: var(--text-muted);">No links added yet.</p>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('promo.add_link', id=promo.id) }}" style="margin-top: 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <input type="url" name="url" class="form-control" placeholder="URL" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="title" class="form-control" placeholder="Title/Description (up to 120 chars)">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Add Link</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Track Info</div>
+            <div class="card-body">
+                {% if promo.track.cover_art_url %}
+                <div style="margin-bottom: 12px;">
+                    <img src="{{ promo.track.cover_art_url }}" alt="Cover Art" class="cover-art">
+                </div>
+                {% endif %}
+
+                <table>
+                    <tr>
+                        <td style="font-weight: 500;">Title</td>
+                        <td>{{ promo.track.title }}</td>
+                    </tr>
+                    {% if promo.track.album %}
+                    <tr>
+                        <td style="font-weight: 500;">Album</td>
+                        <td>{{ promo.track.album }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if promo.track.definition %}
+                    <tr>
+                        <td style="font-weight: 500;">Definition</td>
+                        <td><a href="{{ url_for('definitions.edit', id=promo.track.definition.id) }}">{{ promo.track.definition.name }}</a></td>
+                    </tr>
+                    {% endif %}
+                </table>
+
+                <p style="margin-top: 12px;">
+                    <a href="{{ url_for('tracks.edit', id=promo.track.id) }}">Edit Track &rarr;</a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

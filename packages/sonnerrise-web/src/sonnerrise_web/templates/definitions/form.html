@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ title }}</h2>
+</div>
+
+<div class="two-column">
+    <div>
+        <div class="card">
+            <div class="card-header">Basic Information</div>
+            <div class="card-body">
+                <form method="post" id="definition-form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        {{ form.name.label }}
+                        {{ form.name(class="form-control") }}
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                                <div class="form-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-hint">Up to 120 characters</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.annotation.label }}
+                        {{ form.annotation(class="form-control") }}
+                        <div class="form-hint">Brief annotation, up to 200 characters</div>
+                    </div>
+
+                    <div class="two-column">
+                        <div class="form-group">
+                            {{ form.service_type.label }}
+                            {{ form.service_type(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.model_version.label }}
+                            {{ form.model_version(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.style.label }}
+                        {{ form.style(class="form-control") }}
+                        <div class="form-check" style="margin-top: 8px;">
+                            {{ form.older_models() }}
+                            <label for="older_models">Older Models (limit to 200 chars)</label>
+                        </div>
+                        <div class="form-hint">Up to 1000 characters (or 200 for older models)</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.lyrics.label }}
+                        {{ form.lyrics(class="form-control") }}
+                        <div class="form-hint">Up to 3000 characters. Either Style or Lyrics must be filled.</div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Persona & Voice</div>
+            <div class="card-body">
+                    <div class="two-column">
+                        <div class="form-group">
+                            {{ form.persona_type.label }}
+                            {{ form.persona_type(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.persona_id.label }}
+                            {{ form.persona_id(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.vocals_type.label }}
+                        {{ form.vocals_type(class="form-control") }}
+                    </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Weights</div>
+            <div class="card-body">
+                    <div class="form-group">
+                        <label>Audio Influence: <span id="audio_influence_val">{{ form.audio_influence.data or 25 }}</span></label>
+                        {{ form.audio_influence(class="form-control", type="range", min="0", max="100", oninput="document.getElementById('audio_influence_val').textContent = this.value") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Style Influence: <span id="style_influence_val">{{ form.style_influence.data or 50 }}</span></label>
+                        {{ form.style_influence(class="form-control", type="range", min="0", max="100", oninput="document.getElementById('style_influence_val').textContent = this.value") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Weirdness: <span id="weirdness_val">{{ form.weirdness.data or 50 }}</span></label>
+                        {{ form.weirdness(class="form-control", type="range", min="0", max="100", oninput="document.getElementById('weirdness_val').textContent = this.value") }}
+                    </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Additional</div>
+            <div class="card-body">
+                    <div class="form-group">
+                        {{ form.cover_of_id.label }}
+                        {{ form.cover_of_id(class="form-control") }}
+                        <div class="form-hint">Select a track this is a cover of</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.comments.label }}
+                        {{ form.comments(class="form-control") }}
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="{{ url_for('definitions.list') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        {% if definition %}
+        <div class="card">
+            <div class="card-header">Links</div>
+            <div class="card-body">
+                {% if links %}
+                <ul class="links-list">
+                    {% for link in links %}
+                    <li>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <a href="{{ link.url }}" target="_blank">{{ link.title or link.url }}</a>
+                            <form method="post" action="{{ url_for('definitions.delete_link', id=definition.id, link_id=link.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="color: var(--text-muted);">No links added yet.</p>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('definitions.add_link', id=definition.id) }}" style="margin-top: 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <input type="url" name="url" class="form-control" placeholder="URL" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="title" class="form-control" placeholder="Title (optional)">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Add Link</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Tracks using this Definition</div>
+            <div class="card-body">
+                {% if definition.tracks %}
+                <ul class="links-list">
+                    {% for track in definition.tracks %}
+                    <li>
+                        <a href="{{ url_for('tracks.edit', id=track.id) }}">{{ track.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="color: var(--text-muted);">No tracks use this definition yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

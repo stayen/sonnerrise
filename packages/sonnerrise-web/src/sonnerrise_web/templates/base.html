@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sonnerrise{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Sonnerrise</h1>
+            </div>
+            <ul class="sidebar-nav">
+                {% for item in nav_items %}
+                <li>
+                    <a href="{{ item.url }}" class="{% if request.path == item.url or request.path.startswith(item.url + '/') and item.url != '/' %}active{% endif %}">
+                        <span class="nav-icon">
+                            {% if item.icon == 'home' %}&#8962;{% endif %}
+                            {% if item.icon == 'users' %}&#9786;{% endif %}
+                            {% if item.icon == 'file-text' %}&#9776;{% endif %}
+                            {% if item.icon == 'music' %}&#9835;{% endif %}
+                            {% if item.icon == 'megaphone' %}&#9755;{% endif %}
+                            {% if item.icon == 'calendar' %}&#9776;{% endif %}
+                            {% if item.icon == 'wrench' %}&#9881;{% endif %}
+                        </span>
+                        <span class="nav-text">{{ item.name }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

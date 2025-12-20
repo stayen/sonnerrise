@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ title }}</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.name.label }}
+                {{ form.name(class="form-control") }}
+                {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+                <div class="form-hint">Up to 48 characters</div>
+            </div>
+
+            <div class="form-group">
+                {{ form.style_of_music.label }}
+                {{ form.style_of_music(class="form-control") }}
+                {% if form.style_of_music.errors %}
+                    {% for error in form.style_of_music.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+                <div class="form-hint">Up to 1000 characters (optional)</div>
+            </div>
+
+            <div class="form-group">
+                {{ form.parental_track_id.label }}
+                {{ form.parental_track_id(class="form-control") }}
+                {% if form.parental_track_id.errors %}
+                    {% for error in form.parental_track_id.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+                <div class="form-hint">Reference to a track (optional)</div>
+            </div>
+
+            <div class="form-group">
+                {{ form.comments.label }}
+                {{ form.comments(class="form-control") }}
+                {% if form.comments.errors %}
+                    {% for error in form.comments.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{{ url_for('personas.list') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
