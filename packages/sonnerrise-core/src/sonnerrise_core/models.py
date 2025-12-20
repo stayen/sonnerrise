@@ -1,0 +1,62 @@
+"""Base model classes for Sonnerrise entities.
+
+Provides common base classes and mixins for all database models.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any
+
+from sqlalchemy import DateTime, Integer, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from sonnerrise_core.database.base import Base
+
+
+class TimestampMixin:
+    """Mixin that adds created_at and updated_at timestamps."""
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class BaseModel(Base, TimestampMixin):
+    """Abstract base model with common fields.
+
+    All Sonnerrise entities should inherit from this class.
+    Provides:
+    - Auto-incrementing integer primary key
+    - Created/updated timestamps
+    """
+
+    __abstract__ = True
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert model to dictionary.
+
+        Returns:
+            Dictionary representation of the model.
+        """
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, datetime):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    def __repr__(self) -> str:
+        """Return string representation of the model."""
+        return f"<{self.__class__.__name__}(id={self.id})>"

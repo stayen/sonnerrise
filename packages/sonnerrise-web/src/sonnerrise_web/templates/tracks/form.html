@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ title }}</h2>
+</div>
+
+<div class="two-column">
+    <div>
+        <div class="card">
+            <div class="card-header">Track Information</div>
+            <div class="card-body">
+                <form method="post" id="track-form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        {{ form.title.label }}
+                        {{ form.title(class="form-control") }}
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                                <div class="form-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.album.label }}
+                        {{ form.album(class="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.definition_id.label }}
+                        {{ form.definition_id(class="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.cover_art_url.label }}
+                        {{ form.cover_art_url(class="form-control") }}
+                        <div class="form-hint">External image URL for cover art</div>
+                    </div>
+
+                    {% if track and track.cover_art_url %}
+                    <div class="form-group">
+                        <img src="{{ track.cover_art_url }}" alt="Cover Art" class="cover-art">
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        {{ form.lyrics.label }}
+                        {{ form.lyrics(class="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.comments.label }}
+                        {{ form.comments(class="form-control") }}
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="{{ url_for('tracks.list') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        {% if track %}
+        <div class="card">
+            <div class="card-header">Events</div>
+            <div class="card-body">
+                {% if events %}
+                <table style="width: 100%;">
+                    <tbody>
+                        {% for event in events %}
+                        <tr class="{% if not event.is_enabled %}calendar-event disabled{% endif %}">
+                            <td style="width: 140px;">
+                                {{ event.event_date.strftime('%Y-%m-%d %H:%M') }}
+                            </td>
+                            <td>
+                                {% if not event.is_enabled %}<del>{% endif %}
+                                {{ event.description }}
+                                {% if not event.is_enabled %}</del>{% endif %}
+                            </td>
+                            <td style="width: 120px; text-align: right;">
+                                <form method="post" action="{{ url_for('tracks.toggle_event', id=track.id, event_id=event.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-secondary">
+                                        {{ 'Disable' if event.is_enabled else 'Enable' }}
+                                    </button>
+                                </form>
+                                <form method="post" action="{{ url_for('tracks.delete_event', id=track.id, event_id=event.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">X</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="color: var(--text-muted);">No events scheduled.</p>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('tracks.add_event', id=track.id) }}" style="margin-top: 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label>Date/Time</label>
+                        <input type="datetime-local" name="event_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="e.g., Publish to Distrokid" required>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Add Event</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Links</div>
+            <div class="card-body">
+                {% if links %}
+                <ul class="links-list">
+                    {% for link in links %}
+                    <li>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <a href="{{ link.url }}" target="_blank">{{ link.title or link.url }}</a>
+                            <form method="post" action="{{ url_for('tracks.delete_link', id=track.id, link_id=link.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="color: var(--text-muted);">No links added yet.</p>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('tracks.add_link', id=track.id) }}" style="margin-top: 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <input type="url" name="url" class="form-control" placeholder="URL" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="title" class="form-control" placeholder="Title (optional)">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Add Link</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Promotion</div>
+            <div class="card-body">
+                {% if track.promo %}
+                <p><a href="{{ url_for('promo.edit', id=track.promo.id) }}">View/Edit Promotion &rarr;</a></p>
+                {% else %}
+                <p style="color: var(--text-muted);">No promotion created yet.</p>
+                <a href="{{ url_for('promo.create', track_id=track.id) }}" class="btn btn-secondary">Create Promotion</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

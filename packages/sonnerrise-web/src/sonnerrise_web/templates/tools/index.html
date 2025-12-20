@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Tools - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Tools</h2>
+    <p class="subtitle">Database export and import utilities</p>
+</div>
+
+<div class="two-column">
+    <div>
+        <div class="card">
+            <div class="card-header">Export Database</div>
+            <div class="card-body">
+                <p>Download a backup of your database. You can choose which entities to include.</p>
+
+                <form method="post" action="{{ url_for('tools.export') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="form-group">
+                        <label>Format</label>
+                        <select name="format" class="form-control">
+                            <option value="json">JSON</option>
+                            <option value="yaml">YAML</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Include</label>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_personas" id="include_personas" checked>
+                            <label for="include_personas">Personas ({{ stats.personas }})</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_definitions" id="include_definitions" checked>
+                            <label for="include_definitions">Definitions ({{ stats.definitions }} + {{ stats.definition_links }} links)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_tracks" id="include_tracks" checked>
+                            <label for="include_tracks">Tracks ({{ stats.tracks }} + {{ stats.track_links }} links + {{ stats.track_events }} events)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_promos" id="include_promos" checked>
+                            <label for="include_promos">Promotions ({{ stats.promos }} + {{ stats.promo_links }} links)</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Download Backup</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Import Database</div>
+            <div class="card-body">
+                <p>Upload a backup file to restore data. Supports JSON and YAML formats.</p>
+
+                <form method="post" action="{{ url_for('tools.import_data') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        <label>Backup File</label>
+                        <input type="file" name="file" class="form-control" accept=".json,.yaml,.yml" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            {{ form.skip_existing() }}
+                            <label for="skip_existing">Skip existing records (don't overwrite)</label>
+                        </div>
+                        <div class="form-check">
+                            {{ form.clear_existing() }}
+                            <label for="clear_existing">Clear existing data first (destructive!)</label>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <div class="card-header">Database Statistics</div>
+            <div class="card-body">
+                <table>
+                    <tr>
+                        <td>Personas</td>
+                        <td style="text-align: right; font-weight: 600;">{{ stats.personas }}</td>
+                    </tr>
+                    <tr>
+                        <td>Definitions</td>
+                        <td style="text-align: right; font-weight: 600;">{{ stats.definitions }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 20px; color: var(--text-muted);">Definition Links</td>
+                        <td style="text-align: right;">{{ stats.definition_links }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tracks</td>
+                        <td style="text-align: right; font-weight: 600;">{{ stats.tracks }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 20px; color: var(--text-muted);">Track Links</td>
+                        <td style="text-align: right;">{{ stats.track_links }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 20px; color: var(--text-muted);">Track Events</td>
+                        <td style="text-align: right;">{{ stats.track_events }}</td>
+                    </tr>
+                    <tr>
+                        <td>Promotions</td>
+                        <td style="text-align: right; font-weight: 600;">{{ stats.promos }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 20px; color: var(--text-muted);">Promo Links</td>
+                        <td style="text-align: right;">{{ stats.promo_links }}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid var(--border-color);">
+                        <td><strong>Total Records</strong></td>
+                        <td style="text-align: right; font-weight: 600;">{{ stats.total }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Validate Backup</div>
+            <div class="card-body">
+                <p>Check a backup file without importing it.</p>
+
+                <form method="post" action="{{ url_for('tools.validate') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="form-group">
+                        <input type="file" name="file" class="form-control" accept=".json,.yaml,.yml" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-secondary">Validate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

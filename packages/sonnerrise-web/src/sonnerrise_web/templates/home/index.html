@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Dashboard</h2>
+    <p class="subtitle">Welcome to Sonnerrise - Your Suno track management suite</p>
+</div>
+
+<div class="two-column">
+    <div class="card">
+        <div class="card-header">Quick Stats</div>
+        <div class="card-body">
+            <table>
+                <tr>
+                    <td><a href="{{ url_for('personas.list') }}">Personas</a></td>
+                    <td style="text-align: right; font-weight: 600;">{{ stats.personas }}</td>
+                </tr>
+                <tr>
+                    <td><a href="{{ url_for('definitions.list') }}">Definitions</a></td>
+                    <td style="text-align: right; font-weight: 600;">{{ stats.definitions }}</td>
+                </tr>
+                <tr>
+                    <td><a href="{{ url_for('tracks.list') }}">Tracks</a></td>
+                    <td style="text-align: right; font-weight: 600;">{{ stats.tracks }}</td>
+                </tr>
+                <tr>
+                    <td><a href="{{ url_for('promo.list') }}">Promotions</a></td>
+                    <td style="text-align: right; font-weight: 600;">{{ stats.promos }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Upcoming Events</div>
+        <div class="card-body">
+            {% if upcoming %}
+            <div class="upcoming-events">
+                {% for event in upcoming %}
+                <div class="upcoming-event-item">
+                    <span class="upcoming-event-date urgency-{{ event.urgency }}">
+                        {{ event.event_date.strftime('%b %d') }}
+                    </span>
+                    <span class="upcoming-event-time">
+                        {{ event.event_date.strftime('%H:%M') }}
+                    </span>
+                    <span class="upcoming-event-title">
+                        <a href="{{ url_for('tracks.edit', id=event.track_id) }}">
+                            {{ event.track_title }}
+                        </a>
+                        - {{ event.description }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            <p style="margin-top: 12px;">
+                <a href="{{ url_for('calendar.index') }}">View full calendar &rarr;</a>
+            </p>
+            {% else %}
+            <div class="empty-state">
+                <p>No upcoming events</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Quick Actions</div>
+    <div class="card-body">
+        <div class="btn-group">
+            <a href="{{ url_for('personas.create') }}" class="btn btn-secondary">New Persona</a>
+            <a href="{{ url_for('definitions.create') }}" class="btn btn-secondary">New Definition</a>
+            <a href="{{ url_for('tracks.create') }}" class="btn btn-secondary">New Track</a>
+            <a href="{{ url_for('tools.index') }}" class="btn btn-secondary">Export/Import</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sonnerrise-web"
+version = "0.1.0"
+description = "Flask web interface for Sonnerrise"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+    "flask>=3.0.0",
+    "flask-wtf>=1.2.0",
+    "wtforms>=3.1.0",
+    "sonnerrise-core",
+    "sonnerrise-personas",
+    "sonnerrise-definitions",
+    "sonnerrise-tracks",
+    "sonnerrise-promo",
+    "sonnerrise-calendar",
+    "sonnerrise-tools",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+sonnerrise-web = "sonnerrise_web.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

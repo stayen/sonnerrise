@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - {{ month_view.month_name }} {{ year }} - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Calendar</h2>
+    <p class="subtitle">Track events and schedules</p>
+</div>
+
+<div class="action-bar">
+    <div class="btn-group">
+        <a href="{{ url_for('calendar.index', view='month', year=prev_year, month=prev_month) }}" class="btn btn-secondary">&laquo; Previous</a>
+        <span style="padding: 8px 16px; font-weight: 600;">{{ month_view.month_name }} {{ year }}</span>
+        <a href="{{ url_for('calendar.index', view='month', year=next_year, month=next_month) }}" class="btn btn-secondary">Next &raquo;</a>
+    </div>
+    <div class="btn-group">
+        <a href="{{ url_for('calendar.index', view='month') }}" class="btn btn-primary">Month</a>
+        <a href="{{ url_for('calendar.index', view='week') }}" class="btn btn-secondary">Week</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        <div class="calendar-grid monthly">
+            <!-- Header row -->
+            <div class="calendar-header-cell">Mon</div>
+            <div class="calendar-header-cell">Tue</div>
+            <div class="calendar-header-cell">Wed</div>
+            <div class="calendar-header-cell">Thu</div>
+            <div class="calendar-header-cell">Fri</div>
+            <div class="calendar-header-cell">Sat</div>
+            <div class="calendar-header-cell">Sun</div>
+
+            <!-- Day cells -->
+            {% for week in month_view.weeks %}
+                {% for day in week.days %}
+                <div class="calendar-day {% if not day.is_current_month %}other-month{% endif %} {% if day.is_today %}today{% endif %}">
+                    <div class="calendar-day-number">{{ day.day }}</div>
+                    {% for event in day.events[:3] %}
+                    <a href="{{ url_for('tracks.edit', id=event.track_id) }}"
+                       class="calendar-event {% if not event.is_enabled %}disabled{% endif %}"
+                       title="{{ event.description }}">
+                        {{ event.description[:15] }}{% if event.description|length > 15 %}...{% endif %}
+                    </a>
+                    {% endfor %}
+                    {% if day.events|length > 3 %}
+                    <div style="font-size: 11px; color: var(--text-muted);">+{{ day.events|length - 3 }} more</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if upcoming %}
+<div class="card">
+    <div class="card-header">Upcoming Events</div>
+    <div class="card-body">
+        <div class="upcoming-events">
+            {% for event in upcoming %}
+            <div class="upcoming-event-item">
+                <span class="upcoming-event-date urgency-{{ event.urgency }}">
+                    {{ event.event_date.strftime('%b %d') }}
+                </span>
+                <span class="upcoming-event-time">
+                    {{ event.event_date.strftime('%H:%M') }}
+                </span>
+                <span class="upcoming-event-title">
+                    <a href="{{ url_for('tracks.edit', id=event.track_id) }}">
+                        {{ event.track_title }}
+                    </a>
+                    - {{ event.description }}
+                </span>
+                <span>
+                    <form method="post" action="{{ url_for('calendar.toggle_event', event_id=event.event_id) }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-secondary">
+                            {{ 'Disable' if event.is_enabled else 'Enable' }}
+                        </button>
+                    </form>
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+# Sonnerrise Configuration Example
+# Copy this file to sonnerrise.yaml and adjust settings as needed
+
+database:
+  # Database plugin: mysql or sqlite
+  plugin: mysql
+
+  # MySQL settings
+  host: localhost
+  port: 3306
+  user: sonnerrise
+  password: change-me
+  database: sonnerrise
+  charset: utf8mb4
+
+web:
+  # Web server settings
+  host: 0.0.0.0
+  port: 5000
+  debug: false
+
+  # IMPORTANT: Change this in production!
+  secret_key: change-me-in-production

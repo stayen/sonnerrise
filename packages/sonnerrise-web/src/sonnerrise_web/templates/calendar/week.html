@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - Week {{ week }} {{ year }} - Sonnerrise{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Calendar</h2>
+    <p class="subtitle">Track events and schedules</p>
+</div>
+
+<div class="action-bar">
+    <div class="btn-group">
+        <a href="{{ url_for('calendar.index', view='week', year=prev_year, week=prev_week) }}" class="btn btn-secondary">&laquo; Previous</a>
+        <span style="padding: 8px 16px; font-weight: 600;">
+            Week {{ week }}, {{ year }}
+            ({{ week_start.strftime('%b %d') }} - {{ (week_start + timedelta(days=6)).strftime('%b %d') }})
+        </span>
+        <a href="{{ url_for('calendar.index', view='week', year=next_year, week=next_week) }}" class="btn btn-secondary">Next &raquo;</a>
+    </div>
+    <div class="btn-group">
+        <a href="{{ url_for('calendar.index', view='month') }}" class="btn btn-secondary">Month</a>
+        <a href="{{ url_for('calendar.index', view='week') }}" class="btn btn-primary">Week</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        <div class="calendar-grid weekly">
+            <!-- Header row -->
+            {% for day in week_view.days %}
+            <div class="calendar-header-cell">
+                {{ day.weekday_name[:3] }}<br>
+                {{ day.date.strftime('%d') }}
+            </div>
+            {% endfor %}
+
+            <!-- Day cells -->
+            {% for day in week_view.days %}
+            <div class="calendar-day {% if day.is_today %}today{% endif %}">
+                {% for event in day.events %}
+                <div style="margin-bottom: 8px;">
+                    <a href="{{ url_for('tracks.edit', id=event.track_id) }}"
+                       class="calendar-event {% if not event.is_enabled %}disabled{% endif %}"
+                       style="display: block;">
+                        <strong>{{ event.time }}</strong><br>
+                        {{ event.track_title }}<br>
+                        <small>{{ event.description }}</small>
+                    </a>
+                    <form method="post" action="{{ url_for('calendar.toggle_event', event_id=event.event_id) }}" style="margin-top: 4px;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-secondary">
+                            {{ 'Disable' if event.is_enabled else 'Enable' }}
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <span style="color: var(--text-muted); font-size: 12px;">No events</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Make timedelta available in template
+window.timedelta = function(days) {
+    return days * 24 * 60 * 60 * 1000;
+};
+</script>
+{% endblock %}

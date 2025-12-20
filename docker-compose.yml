@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: sonnerrise-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-sonnerrise}
+      MYSQL_USER: ${MYSQL_USER:-sonnerrise}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-sonnerrise}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - sonnerrise-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sonnerrise-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-5000}:5000"
+    environment:
+      SONNERRISE_DB_HOST: db
+      SONNERRISE_DB_PORT: 3306
+      SONNERRISE_DB_USER: ${MYSQL_USER:-sonnerrise}
+      SONNERRISE_DB_PASSWORD: ${MYSQL_PASSWORD:-sonnerrise}
+      SONNERRISE_DB_NAME: ${MYSQL_DATABASE:-sonnerrise}
+      SONNERRISE_WEB_HOST: 0.0.0.0
+      SONNERRISE_WEB_PORT: 5000
+      SONNERRISE_WEB_SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./config:/app/config:ro
+
+volumes:
+  sonnerrise-db-data:
