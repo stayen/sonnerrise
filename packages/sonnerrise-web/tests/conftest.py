@@ -11,13 +11,14 @@ from flask.testing import FlaskClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from sonnerrise_core.models import BaseModel
+from sonnerrise_core.models import BaseModel, import_all_models
 
 
 @pytest.fixture
 def engine():
     """Create in-memory SQLite engine."""
     engine = create_engine("sqlite:///:memory:")
+    import_all_models()
     BaseModel.metadata.create_all(engine)
     return engine
 

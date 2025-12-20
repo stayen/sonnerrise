@@ -2,6 +2,7 @@
 
 from sonnerrise_core.config import Config, DatabaseConfig
 from sonnerrise_core.database import get_database
+from sonnerrise_core.models import import_all_models
 
 from sonnerrise_promo.models import Promo, PromoLink
 
@@ -37,6 +38,7 @@ class TestPromoModel:
             database=DatabaseConfig(plugin="sqlite", database=":memory:")
         )
         db = get_database(config)
+        import_all_models()
         db.create_tables()
 
         # Create a track first
@@ -81,6 +83,7 @@ class TestPromoLinkModel:
             database=DatabaseConfig(plugin="sqlite", database=":memory:")
         )
         db = get_database(config)
+        import_all_models()
         db.create_tables()
 
         # Create a track first

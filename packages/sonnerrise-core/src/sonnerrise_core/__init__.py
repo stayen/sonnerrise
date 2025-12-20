@@ -6,7 +6,7 @@ from sonnerrise_core.config import Config, DatabaseConfig, WebConfig, load_confi
 SonnerriseConfig = Config
 from sonnerrise_core.database import DatabasePlugin, get_database, register_plugin
 from sonnerrise_core.database.base import Base
-from sonnerrise_core.models import BaseModel, TimestampMixin
+from sonnerrise_core.models import BaseModel, TimestampMixin, import_all_models
 
 __version__ = "0.1.0"
 
@@ -25,6 +25,7 @@ __all__ = [
     "Base",
     "BaseModel",
     "TimestampMixin",
+    "import_all_models",
     # Version
     "__version__",
 ]
