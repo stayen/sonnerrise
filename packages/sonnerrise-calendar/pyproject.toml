@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sonnerrise-calendar"
+version = "0.1.0"
+description = "Calendar module for Sonnerrise - track events calendar view"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+    "sonnerrise-core>=0.1.0",
+    "sonnerrise-tracks>=0.1.0",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.scripts]
+sonnerrise-calendar = "sonnerrise_calendar.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sonnerrise_calendar"]
