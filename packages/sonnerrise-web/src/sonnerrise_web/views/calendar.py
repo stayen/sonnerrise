@@ -6,7 +6,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from sonnerrise_calendar import CalendarService
 from sonnerrise_tracks import TrackEvent
-from sonnerrise_web.app import get_session
+from sonnerrise_web.app import get_db, get_session
 
 calendar_bp = Blueprint("calendar", __name__)
 
@@ -14,8 +14,8 @@ calendar_bp = Blueprint("calendar", __name__)
 @calendar_bp.route("/")
 def index():
     """Show calendar overview with weekly/monthly views."""
-    session = get_session()
-    calendar_service = CalendarService(session)
+    db = get_db()
+    calendar_service = CalendarService(db)
 
     # Get view type
     view_type = request.args.get("view", "month")

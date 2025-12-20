@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Generator
 
 import pytest
@@ -78,16 +77,16 @@ def sample_persona(session: Session):
 @pytest.fixture
 def sample_definition(session: Session, sample_persona):
     """Create sample definition."""
-    from sonnerrise_definitions import Definition
+    from sonnerrise_definitions import Definition, ServiceType, ModelVersion, PersonaType, VocalsType
 
     definition = Definition(
-        name="Test Definition",
-        service_type="suno",
-        model_version="v4.0",
-        persona_type="voice",
+        title="Test Definition",
+        service=ServiceType.SUNO,
+        model=ModelVersion.V4_0,
+        persona_type=PersonaType.VOICE,
         persona_id=sample_persona.id,
-        vocals_type="any",
-        style="Electronic, Synth",
+        vocals=VocalsType.ANY,
+        style_of_music="Electronic, Synth",
     )
     session.add(definition)
     session.commit()
@@ -103,7 +102,6 @@ def sample_track(session: Session, sample_definition):
     track = Track(
         title="Test Track",
         definition_id=sample_definition.id,
-        generation_date=datetime.now(),
     )
     session.add(track)
     session.commit()
@@ -118,7 +116,7 @@ def sample_promo(session: Session, sample_track):
 
     promo = Promo(
         track_id=sample_track.id,
-        summary="Test summary",
+        pitch="Test pitch",
     )
     session.add(promo)
     session.commit()

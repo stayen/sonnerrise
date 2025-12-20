@@ -6,8 +6,11 @@ import os
 from typing import TYPE_CHECKING
 
 from flask import Flask, g
+from flask_wtf.csrf import CSRFProtect
 
 from sonnerrise_core import get_database, load_config
+
+csrf = CSRFProtect()
 
 if TYPE_CHECKING:
     from sonnerrise_core import SonnerriseConfig
@@ -40,6 +43,9 @@ def create_app(config: SonnerriseConfig | None = None) -> Flask:
     # Flask configuration
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
     app.config["WTF_CSRF_ENABLED"] = True
+
+    # Initialize CSRF protection
+    csrf.init_app(app)
 
     # Initialize database
     app.database = get_database(config)
@@ -102,3 +108,13 @@ def get_session():
         Current SQLAlchemy session from Flask g object.
     """
     return g.db_session
+
+
+def get_db():
+    """Get the database plugin.
+
+    Returns:
+        The DatabasePlugin instance from the current app.
+    """
+    from flask import current_app
+    return current_app.database
