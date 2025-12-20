@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import tempfile
-from datetime import datetime
 from pathlib import Path
 from typing import Generator
 
@@ -11,13 +10,14 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from sonnerrise_core.models import BaseModel
+from sonnerrise_core.models import BaseModel, import_all_models
 
 
 @pytest.fixture
 def engine():
     """Create in-memory SQLite engine."""
     engine = create_engine("sqlite:///:memory:")
+    import_all_models()
     BaseModel.metadata.create_all(engine)
     return engine
 
@@ -60,13 +60,13 @@ def sample_definition(session: Session, sample_persona):
     from sonnerrise_definitions import Definition, ServiceType, ModelVersion, PersonaType, VocalsType
 
     definition = Definition(
-        name="Test Definition",
-        service_type=ServiceType.SUNO,
-        model_version=ModelVersion.V4,
-        persona_type=PersonaType.PERSONA,
+        title="Test Definition",
+        service=ServiceType.SUNO,
+        model=ModelVersion.V4_0,
+        persona_type=PersonaType.VOICE,
         persona_id=sample_persona.id,
-        vocals_type=VocalsType.MALE,
-        style="Electronic, Synth",
+        vocals=VocalsType.MALE,
+        style_of_music="Electronic, Synth",
     )
     session.add(definition)
     session.commit()
@@ -82,7 +82,6 @@ def sample_track(session: Session, sample_definition):
     track = Track(
         title="Test Track",
         definition_id=sample_definition.id,
-        generation_date=datetime.now(),
     )
     session.add(track)
     session.commit()
@@ -97,7 +96,7 @@ def sample_promo(session: Session, sample_track):
 
     promo = Promo(
         track_id=sample_track.id,
-        summary="Test summary",
+        pitch="Test pitch",
     )
     session.add(promo)
     session.commit()

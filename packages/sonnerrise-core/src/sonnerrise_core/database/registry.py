@@ -35,6 +35,7 @@ def get_plugin_class(name: str) -> type[DatabasePlugin]:
     Raises:
         ValueError: If the plugin is not registered.
     """
+    _register_builtin_plugins()
     name = name.lower()
     if name not in _plugins:
         available = ", ".join(sorted(_plugins.keys())) or "none"
@@ -48,6 +49,7 @@ def list_plugins() -> list[str]:
     Returns:
         List of registered plugin names.
     """
+    _register_builtin_plugins()
     return sorted(_plugins.keys())
 
 
@@ -66,9 +68,6 @@ def get_database(config: Config | DatabaseConfig) -> DatabasePlugin:
         db_config = config.database
     else:
         db_config = config
-
-    # Ensure built-in plugins are registered
-    _register_builtin_plugins()
 
     plugin_class = get_plugin_class(db_config.plugin)
     return plugin_class(db_config)

@@ -60,3 +60,41 @@ class BaseModel(Base, TimestampMixin):
     def __repr__(self) -> str:
         """Return string representation of the model."""
         return f"<{self.__class__.__name__}(id={self.id})>"
+
+
+def import_all_models() -> None:
+    """Import all Sonnerrise models to register them with SQLAlchemy metadata.
+
+    This function should be called before create_tables() when testing
+    to ensure all models (and their foreign key relationships) are
+    properly registered.
+
+    Models from packages that aren't installed will be silently skipped.
+    """
+    # Import models from each package to register them with Base.metadata
+    # Use try/except to handle cases where packages aren't installed
+
+    try:
+        from sonnerrise_personas.models import Persona  # noqa: F401
+    except ImportError:
+        pass
+
+    try:
+        from sonnerrise_definitions.models import Definition, DefinitionLink  # noqa: F401
+    except ImportError:
+        pass
+
+    try:
+        from sonnerrise_tracks.models import Track, TrackEvent, TrackLink  # noqa: F401
+    except ImportError:
+        pass
+
+    try:
+        from sonnerrise_promo.models import Promo, PromoLink  # noqa: F401
+    except ImportError:
+        pass
+
+    try:
+        from sonnerrise_calendar.models import CalendarEvent  # noqa: F401
+    except ImportError:
+        pass

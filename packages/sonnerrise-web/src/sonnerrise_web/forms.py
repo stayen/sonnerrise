@@ -40,7 +40,7 @@ class PersonaForm(FlaskForm):
 class DefinitionForm(FlaskForm):
     """Form for creating/editing definitions."""
 
-    name = StringField(
+    title = StringField(
         "Title",
         validators=[DataRequired(), Length(max=120)],
         render_kw={"placeholder": "Definition title"},
@@ -50,27 +50,27 @@ class DefinitionForm(FlaskForm):
         validators=[Length(max=200)],
         render_kw={"placeholder": "Brief annotation (optional)", "rows": 2},
     )
-    service_type = SelectField(
+    service = SelectField(
         "Service",
         choices=[("suno", "Suno")],
         default="suno",
     )
-    model_version = SelectField(
+    model = SelectField(
         "Model Version",
         choices=[
             ("v3.5", "v3.5"),
             ("v4.0", "v4.0"),
-            ("v4.5", "v4.5+"),
+            ("v4.5+", "v4.5+"),
             ("v5.0", "v5.0"),
         ],
         default="v4.0",
     )
-    style = TextAreaField(
+    style_of_music = TextAreaField(
         "Style of Music",
         validators=[Length(max=1000)],
         render_kw={"placeholder": "Style of music", "rows": 3},
     )
-    older_models = BooleanField(
+    older_models_style = BooleanField(
         "Older Models (limit style to 200 chars)",
         default=False,
     )
@@ -93,7 +93,7 @@ class DefinitionForm(FlaskForm):
         coerce=lambda x: int(x) if x else None,
         validators=[Optional()],
     )
-    vocals_type = SelectField(
+    vocals = SelectField(
         "Vocals",
         choices=[
             ("any", "Any"),
@@ -117,7 +117,7 @@ class DefinitionForm(FlaskForm):
         validators=[NumberRange(min=0, max=100)],
         default=50,
     )
-    cover_of_id = SelectField(
+    cover_of_track_id = SelectField(
         "Cover Of",
         coerce=lambda x: int(x) if x else None,
         validators=[Optional()],

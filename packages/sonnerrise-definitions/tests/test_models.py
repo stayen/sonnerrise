@@ -2,6 +2,7 @@
 
 from sonnerrise_core.config import Config, DatabaseConfig
 from sonnerrise_core.database import get_database
+from sonnerrise_core.models import import_all_models
 
 from sonnerrise_definitions.models import (
     Definition,
@@ -47,6 +48,7 @@ class TestDefinitionModel:
             database=DatabaseConfig(plugin="sqlite", database=":memory:")
         )
         db = get_database(config)
+        import_all_models()
         db.create_tables()
 
         with db.session() as session:
@@ -87,6 +89,7 @@ class TestDefinitionLinkModel:
             database=DatabaseConfig(plugin="sqlite", database=":memory:")
         )
         db = get_database(config)
+        import_all_models()
         db.create_tables()
 
         with db.session() as session:

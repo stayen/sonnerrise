@@ -61,9 +61,9 @@ def create():
     form = TrackForm()
 
     # Populate definition choices
-    definitions = session.query(Definition).order_by(Definition.name).all()
+    definitions = session.query(Definition).order_by(Definition.title).all()
     form.definition_id.choices = [("", "None")] + [
-        (str(d.id), d.name) for d in definitions
+        (str(d.id), d.title) for d in definitions
     ]
 
     if form.validate_on_submit():
@@ -98,9 +98,9 @@ def edit(id: int):
     event_form = TrackEventForm()
 
     # Populate definition choices
-    definitions = session.query(Definition).order_by(Definition.name).all()
+    definitions = session.query(Definition).order_by(Definition.title).all()
     form.definition_id.choices = [("", "None")] + [
-        (str(d.id), d.name) for d in definitions
+        (str(d.id), d.title) for d in definitions
     ]
 
     if form.validate_on_submit():

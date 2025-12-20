@@ -213,12 +213,14 @@ class CalendarService:
         self,
         days: int = 7,
         include_disabled: bool = False,
+        limit: int | None = None,
     ) -> EventList:
         """Get upcoming events within a number of days.
 
         Args:
             days: Number of days to look ahead.
             include_disabled: Whether to include disabled events.
+            limit: Maximum number of events to return. None for no limit.
 
         Returns:
             EventList with upcoming events.
@@ -244,6 +246,10 @@ class CalendarService:
                 query = query.filter(TrackEvent.enabled == True)
 
             query = query.order_by(TrackEvent.datetime)
+
+            if limit is not None:
+                query = query.limit(limit)
+
             events = query.all()
 
             upcoming = [
@@ -345,12 +351,12 @@ class CalendarService:
 
             events = query.all()
 
-        # Count by month
-        counts: dict[int, int] = {m: 0 for m in range(1, 13)}
-        for event in events:
-            counts[event.datetime.month] += 1
+            # Count by month (must be done inside session)
+            counts: dict[int, int] = {m: 0 for m in range(1, 13)}
+            for event in events:
+                counts[event.datetime.month] += 1
 
-        return counts
+            return counts
 
     def get_tracks_with_upcoming_events(
         self,

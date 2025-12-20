@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template
 
-from sonnerrise_web.app import get_session
+from sonnerrise_web.app import get_db, get_session
 
 home_bp = Blueprint("home", __name__)
 
@@ -28,7 +28,8 @@ def index():
     # Get upcoming events
     from sonnerrise_calendar import CalendarService
 
-    calendar_service = CalendarService(session)
+    db = get_db()
+    calendar_service = CalendarService(db)
     upcoming = calendar_service.get_upcoming_events(limit=5)
 
     return render_template("home/index.html", stats=stats, upcoming=upcoming)
