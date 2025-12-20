@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sonnerrise-tools"
+version = "0.1.0"
+description = "Tools module for Sonnerrise - database export/import utilities"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+    "sonnerrise-core>=0.1.0",
+    "sonnerrise-personas>=0.1.0",
+    "sonnerrise-definitions>=0.1.0",
+    "sonnerrise-tracks>=0.1.0",
+    "sonnerrise-promo>=0.1.0",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.scripts]
+sonnerrise-tools = "sonnerrise_tools.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sonnerrise_tools"]
