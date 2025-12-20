@@ -28,22 +28,22 @@ def list():
 
     if search:
         query = query.filter(
-            (Definition.name.ilike(f"%{search}%"))
-            | (Definition.style.ilike(f"%{search}%"))
+            (Definition.title.ilike(f"%{search}%"))
+            | (Definition.style_of_music.ilike(f"%{search}%"))
         )
 
     if service:
-        query = query.filter(Definition.service_type == service)
+        query = query.filter(Definition.service == service)
 
     if model:
-        query = query.filter(Definition.model_version == model)
+        query = query.filter(Definition.model == model)
 
     # Get total count
     total = query.count()
 
     # Paginate
     definitions = (
-        query.order_by(Definition.name)
+        query.order_by(Definition.title)
         .offset((page - 1) * per_page)
         .limit(per_page)
         .all()
@@ -77,25 +77,26 @@ def create():
 
     # Populate track choices for cover_of
     tracks = session.query(Track).order_by(Track.title).all()
-    form.cover_of_id.choices = [("", "None")] + [
+    form.cover_of_track_id.choices = [("", "None")] + [
         (str(t.id), t.title) for t in tracks
     ]
 
     if form.validate_on_submit():
         definition = Definition(
-            name=form.name.data,
+            title=form.title.data,
             annotation=form.annotation.data or None,
-            service_type=form.service_type.data,
-            model_version=form.model_version.data,
-            style=form.style.data or None,
+            service=form.service.data,
+            model=form.model.data,
+            style_of_music=form.style_of_music.data or None,
+            older_models_style=form.older_models_style.data,
             lyrics=form.lyrics.data or None,
             persona_type=form.persona_type.data if form.persona_type.data != "none" else None,
             persona_id=form.persona_id.data,
-            vocals_type=form.vocals_type.data,
+            vocals=form.vocals.data,
             audio_influence=form.audio_influence.data,
             style_influence=form.style_influence.data,
             weirdness=form.weirdness.data,
-            cover_of_id=form.cover_of_id.data,
+            cover_of_track_id=form.cover_of_track_id.data,
             comments=form.comments.data or None,
         )
         session.add(definition)
@@ -127,7 +128,7 @@ def edit(id: int):
 
     # Populate track choices for cover_of
     tracks = session.query(Track).order_by(Track.title).all()
-    form.cover_of_id.choices = [("", "None")] + [
+    form.cover_of_track_id.choices = [("", "None")] + [
         (str(t.id), t.title) for t in tracks
     ]
 
@@ -136,19 +137,20 @@ def edit(id: int):
         form.persona_type.data = definition.persona_type
 
     if form.validate_on_submit():
-        definition.name = form.name.data
+        definition.title = form.title.data
         definition.annotation = form.annotation.data or None
-        definition.service_type = form.service_type.data
-        definition.model_version = form.model_version.data
-        definition.style = form.style.data or None
+        definition.service = form.service.data
+        definition.model = form.model.data
+        definition.style_of_music = form.style_of_music.data or None
+        definition.older_models_style = form.older_models_style.data
         definition.lyrics = form.lyrics.data or None
         definition.persona_type = form.persona_type.data if form.persona_type.data != "none" else None
         definition.persona_id = form.persona_id.data
-        definition.vocals_type = form.vocals_type.data
+        definition.vocals = form.vocals.data
         definition.audio_influence = form.audio_influence.data
         definition.style_influence = form.style_influence.data
         definition.weirdness = form.weirdness.data
-        definition.cover_of_id = form.cover_of_id.data
+        definition.cover_of_track_id = form.cover_of_track_id.data
         definition.comments = form.comments.data or None
         session.commit()
 

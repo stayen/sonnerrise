@@ -13,7 +13,7 @@
         <a href="{{ url_for('calendar.index', view='week', year=prev_year, week=prev_week) }}" class="btn btn-secondary">&laquo; Previous</a>
         <span style="padding: 8px 16px; font-weight: 600;">
             Week {{ week }}, {{ year }}
-            ({{ week_start.strftime('%b %d') }} - {{ (week_start + timedelta(days=6)).strftime('%b %d') }})
+            ({{ week_view.start_date.strftime('%b %d') }} - {{ week_view.end_date.strftime('%b %d') }})
         </span>
         <a href="{{ url_for('calendar.index', view='week', year=next_year, week=next_week) }}" class="btn btn-secondary">Next &raquo;</a>
     </div>
@@ -29,7 +29,7 @@
             <!-- Header row -->
             {% for day in week_view.days %}
             <div class="calendar-header-cell">
-                {{ day.weekday_name[:3] }}<br>
+                {{ day.day_name[:3] }}<br>
                 {{ day.date.strftime('%d') }}
             </div>
             {% endfor %}
@@ -40,16 +40,16 @@
                 {% for event in day.events %}
                 <div style="margin-bottom: 8px;">
                     <a href="{{ url_for('tracks.edit', id=event.track_id) }}"
-                       class="calendar-event {% if not event.is_enabled %}disabled{% endif %}"
+                       class="calendar-event {% if not event.enabled %}disabled{% endif %}"
                        style="display: block;">
-                        <strong>{{ event.time }}</strong><br>
+                        <strong>{{ event.time_str }}</strong><br>
                         {{ event.track_title }}<br>
                         <small>{{ event.description }}</small>
                     </a>
                     <form method="post" action="{{ url_for('calendar.toggle_event', event_id=event.event_id) }}" style="margin-top: 4px;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-sm btn-secondary">
-                            {{ 'Disable' if event.is_enabled else 'Enable' }}
+                            {{ 'Disable' if event.enabled else 'Enable' }}
                         </button>
                     </form>
                 </div>

@@ -57,18 +57,18 @@
                 <tr>
                     <td>
                         <a href="{{ url_for('definitions.edit', id=definition.id) }}">
-                            {{ definition.name }}
+                            {{ definition.title }}
                         </a>
                     </td>
                     <td>
-                        <span class="badge">{{ definition.service_type }}</span>
+                        <span class="badge">{{ definition.service.value if definition.service else '-' }}</span>
                     </td>
                     <td>
-                        <span class="badge badge-primary">{{ definition.model_version }}</span>
+                        <span class="badge badge-primary">{{ definition.model.value if definition.model else '-' }}</span>
                     </td>
                     <td>
-                        {% if definition.style %}
-                            {{ definition.style[:30] }}{% if definition.style|length > 30 %}...{% endif %}
+                        {% if definition.style_of_music %}
+                            {{ definition.style_of_music[:30] }}{% if definition.style_of_music|length > 30 %}...{% endif %}
                         {% else %}
                             <span style="color: var(--text-muted);">-</span>
                         {% endif %}

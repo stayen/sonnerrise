@@ -171,6 +171,10 @@ class ImportService:
         self.session.query(Definition).delete()
         self.session.query(Persona).delete()
 
+        # Flush deletes and expunge all to clear identity map
+        self.session.flush()
+        self.session.expunge_all()
+
     def _import_personas(
         self,
         personas: list[dict[str, Any]],
