@@ -35,6 +35,7 @@ line_length = 100
 testpaths = ["packages"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+addopts = "--import-mode=importlib"
 
 [tool.bumpversion]
 current_version = "0.1.0"
