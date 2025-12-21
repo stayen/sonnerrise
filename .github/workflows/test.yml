@@ -47,7 +47,7 @@ jobs:
           pip install -e packages/sonnerrise-tools
           pip install -e packages/sonnerrise-web
 
-      - name: Run tests
+- name: Run tests
         env:
           SONNERRISE_DB_HOST: 127.0.0.1
           SONNERRISE_DB_PORT: 3306
@@ -55,7 +55,12 @@ jobs:
           SONNERRISE_DB_PASSWORD: testpassword
           SONNERRISE_DB_NAME: sonnerrise_test
         run: |
-          pytest packages/ --cov=packages --cov-report=xml -v
+          coverage_args=""
+          for pkg in packages/sonnerrise-*/; do
+            echo "=== Testing $pkg ==="
+            pytest "$pkg" -v --cov --cov-append
+          done
+          coverage xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
