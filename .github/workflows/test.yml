@@ -47,7 +47,7 @@ jobs:
           pip install -e packages/sonnerrise-tools
           pip install -e packages/sonnerrise-web
 
-- name: Run tests
+      - name: Run tests
         env:
           SONNERRISE_DB_HOST: 127.0.0.1
           SONNERRISE_DB_PORT: 3306
