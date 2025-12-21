@@ -120,8 +120,10 @@ class DatabasePlugin(ABC):
 
     def create_tables(self) -> None:
         """Create all tables defined in the metadata."""
+        from sonnerrise_core.models import import_all_models
+        import_all_models()
         metadata.create_all(self.engine)
-
+    
     def drop_tables(self) -> None:
         """Drop all tables defined in the metadata."""
         metadata.drop_all(self.engine)
