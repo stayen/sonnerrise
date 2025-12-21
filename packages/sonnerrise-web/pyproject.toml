@@ -21,6 +21,9 @@ dependencies = [
     "sonnerrise-calendar",
     "sonnerrise-tools",
 ]
+authors = [
+    { name = "Konstantin Boyandin", email = "developer@boyandin.com" }
+]
 
 [project.optional-dependencies]
 dev = [
