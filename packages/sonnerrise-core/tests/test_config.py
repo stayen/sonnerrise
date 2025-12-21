@@ -143,6 +143,13 @@ class TestLoadConfig:
 
     def test_load_from_file(self, tmp_path: Path, monkeypatch):
         """Test loading from specific file."""
+        # Clear environment variables that would override config
+        monkeypatch.delenv("SONNERRISE_DB_NAME", raising=False)
+        monkeypatch.delenv("SONNERRISE_DB_HOST", raising=False)
+        monkeypatch.delenv("SONNERRISE_DB_PORT", raising=False)
+        monkeypatch.delenv("SONNERRISE_DB_USER", raising=False)
+        monkeypatch.delenv("SONNERRISE_DB_PASSWORD", raising=False)
+        
         config_file = tmp_path / "test-config.yaml"
         config_file.write_text("""
 database:
@@ -152,7 +159,7 @@ database:
         config = load_config(config_file)
         assert config.database.plugin == "sqlite"
         assert config.database.database == ":memory:"
-
+    
     def test_env_override(self, tmp_path: Path, monkeypatch):
         """Test that environment variables override file settings."""
         config_file = tmp_path / "config.yaml"
